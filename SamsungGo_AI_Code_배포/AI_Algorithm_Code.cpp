@@ -5,7 +5,7 @@
 #include <time.h>
 #include "Connect6Algo.h"
 
-char info[] = { "TeamName:¾¾µÎ¹Ú³â,Department:POSCAT" };
+char info[] = { "TeamName:¾¾µÎ¹Ú³â¾Æ,Department:POSCAT" };
 
 // my code
 #include <utility>
