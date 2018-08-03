@@ -14,13 +14,13 @@ int terminateAI;
 int width = 19, height = 19;
 int cnt = 2;
 int myColor;
-FILE *fp=NULL;
+FILE *fp = NULL;
 
 static char cmd[256];
 static HANDLE event1, event2;
 #define BOARD_SIZE 20
 int board[BOARD_SIZE][BOARD_SIZE];
-int limitTime=0;
+int limitTime = 0;
 
 static void getLine() {
 	int c, bytes;
@@ -52,7 +52,7 @@ static const char *getParam(const char *command, const char *input) {
 	n2 = (int)strlen(input);
 	if (n1 > n2 || _strnicmp(command, input, n1)) return NULL;
 	input += strlen(command);
-	while (isspace(input[0])) input++;	
+	while (isspace(input[0])) input++;
 	return input;
 }
 
@@ -76,9 +76,9 @@ void domymove(int x[], int y[], int cnt) {
 	char buf[200] = { " " };
 
 	mymove(x, y, cnt);
-	if (cnt == 1){
+	if (cnt == 1) {
 		setLine("%d,%d", x[0], y[0]);
-		sprintf_s(buf, "-- output: %d,%d \n", x[0], y[0]);		
+		sprintf_s(buf, "-- output: %d,%d \n", x[0], y[0]);
 	}
 	else
 	{
@@ -87,7 +87,7 @@ void domymove(int x[], int y[], int cnt) {
 	}
 
 	writeLog(buf);
-	
+
 }
 
 int showBoard(int x, int y) {
@@ -100,7 +100,7 @@ static void doCommand() {
 
 
 	char buf[200] = { " " };
-	sprintf_s(buf, "-- input: %s \n",cmd);
+	sprintf_s(buf, "-- input: %s \n", cmd);
 	writeLog(buf);
 
 	if ((param = getParam("START", cmd)) != 0) {
@@ -125,7 +125,7 @@ static void doCommand() {
 			setLine("ERROR 형식에 맞지 않는 좌표가 입력되었습니다");
 
 			char buf[200] = { " " };
-			sprintf_s(buf, "-- output: %s \n","ERROR 형식에 맞지 않는 좌표가 입력되었습니다" );
+			sprintf_s(buf, "-- output: %s \n", "ERROR 형식에 맞지 않는 좌표가 입력되었습니다");
 			writeLog(buf);
 
 			return;
@@ -143,8 +143,8 @@ static void doCommand() {
 				}
 			}
 			cnt = 2;
-			opmove(x, y, r / 2);	
-			turn(); 
+			opmove(x, y, r / 2);
+			turn();
 		}
 	}
 	else if ((param = getParam("INFO", cmd)) != 0) {
@@ -154,7 +154,7 @@ static void doCommand() {
 		sprintf_s(buf, "-- output: %s \n", info);
 		writeLog(buf);
 	}
-	else if ((param = getParam("BLOCK", cmd)) != 0) {	
+	else if ((param = getParam("BLOCK", cmd)) != 0) {
 		int x, y;
 		if (((sscanf_s(param, "%d,%d", &x, &y)) == 2)) {
 			block(x, y);
@@ -165,8 +165,8 @@ static void doCommand() {
 			writeLog(buf);
 		}
 	}
-	else if ((param = getParam("LimitTime", cmd)) != 0){
-		sscanf_s(param, "%d", &limitTime);	
+	else if ((param = getParam("LimitTime", cmd)) != 0) {
+		sscanf_s(param, "%d", &limitTime);
 	}
 	else if ((param = getParam("QUIT", cmd)) != 0) {
 		exit(0);
@@ -174,11 +174,11 @@ static void doCommand() {
 
 }
 
-static DWORD WINAPI threadLoop(LPVOID) {	
+static DWORD WINAPI threadLoop(LPVOID) {
 	while (1) {
 		WaitForSingleObject(event1, INFINITE);
 		myturn(cnt);
-		if (cnt == 1) cnt = 2;	
+		if (cnt == 1) cnt = 2;
 		SetEvent(event2);
 	}
 }
@@ -190,15 +190,15 @@ void writeLog(char *myLog)
 
 	if (fp != NULL)
 	{
-		fprintf(fp,myLog);
+		fprintf(fp, myLog);
 	}
 
-	fclose(fp);	
+	fclose(fp);
 }
 
 int main() {
 	DWORD mode;
-	
+
 
 	if (GetConsoleMode(GetStdHandle(STD_INPUT_HANDLE), &mode))
 		puts("직접 실행 불가능한 파일입니다. 육목 알고리즘 대회 툴을 이용해 실행하세요.");
@@ -221,7 +221,7 @@ int isFree(int x, int y)
 	return x >= 0 && y >= 0 && x < width && y < height && board[x][y] == 0;
 }
 
-void init() {	
+void init() {
 	for (int i = 0; i < width; i++) {
 		for (int j = 0; j < height; j++) {
 			board[i][j] = 0;
@@ -240,8 +240,12 @@ void mymove(int x[], int y[], int cnt) {
 	}
 }
 
+int op_x[2], op_y[2], op_cnt;
+
 void opmove(int x[], int y[], int cnt) {
+	op_cnt = cnt;
 	for (int i = 0; i < cnt; i++) {
+		op_x[i] = x[i]; op_y[i] = y[i];
 		if (isFree(x[i], y[i])) {
 			board[x[i]][y[i]] = 2;
 		}
@@ -256,4 +260,3 @@ void block(int x, int y) {
 		board[x][y] = 3;
 	}
 }
-
